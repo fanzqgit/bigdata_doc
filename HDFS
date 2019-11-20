@@ -31,4 +31,4 @@
 2、HDFS集群有一个NameNode和管理文件系统名称空间并控制客户端对文件访问的主服务器，以及许多数据节点。
 3、NameNode执行文件系统名称空间的操作，如打开，关闭和重命名文件和目录。还确定文件块到DataNode的映射。
 4、DataNode负责处理来自文件系统客户端的读写操作。还执行文件块的创建和删除等。
-
+![Image Text](https://github.com/fzqgithub/bigdata_doc/blob/master/hdfsarchitecture.png)
