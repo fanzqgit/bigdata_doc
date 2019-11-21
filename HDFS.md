@@ -113,7 +113,7 @@ HDFS使用的典型块大小为128 MB。
 ### 辅助功能 ###
 可以通过许多不同的方式从应用程序访问HDFS。  
 1、FS Shell  
-FS Shell适用于需要脚本语言与存储的数据进行交互的应用程序。  
+FS Shell适用于需要脚本语言与存储的数据进行交互的应用程序。 
 
 2、FileSystem Java API  
 
@@ -133,11 +133,39 @@ DFSAdmin命令集用于管理HDFS群集。这些是仅由HDFS管理员使用的�
 当文件的复制因子降低时，NameNode将选择可删除的多余副本。下一个Heartbeat将此信息传输到DataNode。然后，DataNode删除相应的块，相应的可用空间出现在集群中。  
 同样，在setReplication API调用完成与群集中的可用空间出现之间可能会有时间延迟。  
 
-** HDFS源代码：http : //hadoop.apache.org/version_control.html **
-** Hadoop源代码位于Apache git存储库中，可从以下位置获取：https://github.com/apache/hadoop **
-** 所做的更改也反映到github存储库：https://gitbox.apache.org/repos/asf?p=hadoop.git **
+**HDFS源代码：http://hadoop.apache.org/version_control.html   
+Hadoop源代码位于Apache git存储库中，可从以下位置获取：https://github.com/apache/hadoop   
+所做的更改也反映到github存储库：https://gitbox.apache.org/repos/asf?p=hadoop.git**  
 
 
+# 二、HDFS用户指南 #
+### 网页界面 ###
+NameNode和DataNode各自运行一个内部Web服务器，以显示有关群集当前状态的基本信息。  
+使用默认配置，NameNode主页位于 http://namenode-name:9870/ 。它列出了集群中的DataNodes和集群的基本统计信息。  
+
+### Shell命令 ### 
+bin/hdfs dfs -help 列出了Hadoop shell支持的命令。  
+bin/hdfs dfs -help command-name  显示命令的更多详细帮助。  
+1、DFSAdmin命令  
+bin/hdfs dfsadmin 命令支持一些HDFS管理相关的操作。  
+-report：报告HDFS的基本统计信息。这些信息中的某些信息也可以在NameNode主页上找到。  
+-safemode：尽管通常不需要，但是管理员可以手动输入或退出Safemode。  
+-finalizeUpgrade：删除上一次升级过程中对集群所做的先前备份。  
+-refreshNodes：使用允许连接到名称节点的一组数据节点来更新名称节点。  
+-printTopology：打印集群的拓扑。显示一个由名称节点查看的连接到轨道的机架树和数据节点树。  
+
+### 次要名称节点 ### 
+NameNode将对文件系统的修改存储为附加到本机文件系统文件edits的日志。  
+当NameNode启动时，它从图像文件fsimage读取HDFS状态，然后应用编辑日志文件中的编辑。  
+然后，它将新的HDFS状态写入fsimage，并以空的编辑文件开始正常操作。  
+由于NameNode只在启动期间合并fsimage并编辑文件，因此编辑日志文件在繁忙的集群上可能会随着时间的推移变得非常大。  
+较大的编辑文件的另一个副作用是下次重新启动NameNode需要更长的时间。
+SecondaryNameNode定期合并fsimage和编辑日志文件，并将编辑日志大小保持在限制范围内。它通常在不同于主NameNode的计算机上运行，因为它的内存需求与主NameNode的顺序相同。  
+>dfs.namenode.checkpoint.period，默认设置为1小时，指定两个连续检查点之间的最大延迟，并且,dfs.namenode.checkpoint.txns（默认设置为100万）定义了NameNode上的非检查点事务数，即使尚未达到检查点期限，该事务也会强制执行紧急检查点。  
+次要NameNode将最新的检查点存储在目录中，该目录的结构与主要NameNode的目录相同。因此，如有必要，主NameNode始终可以准备好检查点图像。  
+有关命令用法，请参见secondarynamenode [https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-hdfs/HDFSCommands.html#secondarynamenode]。  
+
+### 备份节点 ###
 
 
 
